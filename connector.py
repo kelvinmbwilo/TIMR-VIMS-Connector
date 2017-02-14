@@ -10,10 +10,19 @@ vims_password = ''
 timr_username = ''
 timr_password = ''
 timr_server = ''
-vims_server = ""
+vims_server = ''
 
 def get_server_request(url):
     r = requests.get(vims_server + url, auth=HTTPBasicAuth(vims_username, vims_password))
+    if r.status_code == 200:
+        return r.json()
+    else:
+        return 'error'
+
+
+def update_report(data):
+    r = requests.put(vims_server + 'rest-api/ivd/submit', json=data, auth=HTTPBasicAuth(vims_username, vims_password))
+    print r
     if r.status_code == 200:
         return r.json()
     else:
@@ -410,6 +419,8 @@ if report_is_available:
             deseas_count += 1
         f = open('dataValues_.json', 'w')
         f.write(json.dumps(monthly_report))
+
+        update_report(monthly_report['report'])
         exit()
         for vacinnate in vaccinations['healthFacilityVaccinations']:
             immunization = {}
